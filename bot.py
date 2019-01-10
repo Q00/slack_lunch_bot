@@ -12,7 +12,7 @@ def create_bot():
     slacker = Slacker(token)
     #slack.chat.post_message('#random','test!')
     print(slacker)
-    return bot_class.Bot(slacker)
+    return bot_class.Bot(slacker, config)
 
 def run():
     bot = create_bot()

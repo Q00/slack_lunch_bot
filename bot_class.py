@@ -1,12 +1,13 @@
 import json
 import websocket
+
 class Bot:
    
     calling_msg = '~점심'
-    def __init__(self, slacker ):
+    def __init__(self, slacker, config ):
         print('init')
         self.slacker = slacker
-        
+        self.config = config 
 
     def loop(self):
         print('start loop')
@@ -66,3 +67,5 @@ class Bot:
         msg = text
         print(msg)
         return channel, msg 
+
+
