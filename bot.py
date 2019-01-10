@@ -1,7 +1,7 @@
 from slacker import Slacker
-import configparser
+import json
 
-config = configparser.ConfigParser()
-config.read('env.json')
+with open('env.json','r') as f:
+    config=json.load(f)
 
 token = config['DEFAULT']['TOKEN'] 
