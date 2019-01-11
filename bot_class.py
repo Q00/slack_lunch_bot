@@ -3,7 +3,7 @@ import websocket
 import requests
 
 class Bot:
-   
+
     calling_msg = '~점심'
     def __init__(self, slacker, config ):
         print('init')
@@ -46,7 +46,7 @@ class Bot:
 
                 break
             except websocket.WebSocketTimeoutException:
-                self._socket.send(json.dumbs({'type':'ping'}))
+                self._socket.send(json.dumps({'type':'ping'}))
             
             except websocket.WebSocketConnectionClosedException:
                 print("Connection closed")
