@@ -47,6 +47,10 @@ class Bot:
                 break
             except websocket.WebSocketTimeoutException:
                 self._socket.send(json.dumbs({'type':'ping'}))
+            
+            except websocket.WebSocketConnectionClosedException:
+                print("Connection closed")
+                break
 
             except Exception as e :
                 print(e)
