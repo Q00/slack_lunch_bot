@@ -46,7 +46,7 @@ class Bot:
 
                 break
             except websocket.WebSocketTimeoutException:
-                self.ws.send(json.dumbs({'type':'ping'}))
+                self._socket.send(json.dumbs({'type':'ping'}))
 
             except Exception as e :
                 print(e)
