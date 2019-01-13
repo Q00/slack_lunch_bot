@@ -1,6 +1,8 @@
 import json
 import websocket
 import requests
+from random import * 
+from time import sleep
 
 class Bot:
 
@@ -13,18 +15,21 @@ class Bot:
 
     def loop(self):
         print('start loop')
-        count =0
+        count = 0
         list= []
         while True:
-           channel, msg = self._read()
-           if count==0  :
-               list = self._crwaling(msg)
-           else:
-               pass
-           msg = '대표님 점심으로 이건 어때요?\n'+list[count]
-           print('befor send')
-           self._send(channel,msg)
-           count+=1 
+            sleep(2)
+            channel, msg = self._read()
+            if not channel or not  msg:
+                continue
+            if count==0  :
+                list = self._crwaling(msg)
+                count =randint(0,19)
+            else:
+                pass
+            msg = '우리 이거먹어요!\n'+list[count]
+            print('befor send')
+            self._send(channel,msg)
     
     def _read(self):
         slacker = self.slacker
@@ -80,33 +85,50 @@ class Bot:
         return channel, msg 
 
     def _crwaling(self,msg):
-        api_key = self.config['DEFAULT']['API_KEY']
-        query = '필동 식당'
-        #https://maps.googleapis.com/maps/api/place/
-        url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
-        #https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=1500&type=restaurant&keyword=cruise&key=YOUR_API_KEY
- 
-        params= {'key':api_key,'location':'37.561306,126.994500','rankby':'distance','keyword':'필동 식당','type':'restaurant'}
-        
-        get_data = requests.get(url,params=params)
-        print(get_data.text) 
-
-        data_list = json.loads(get_data.text)
-        next_page_token = data_list['next_page_token']
-         
-        list = []
-        for data in data_list['results']:
-            vicinity = data['vicinity']
-            user_ratings_total = data['user_ratings_total']
-            rating = data['rating']
-            name = data['name']
-            restraunt = f'''
-            ```
-            이름 : {name}
-            주소 : {vicinity}
-            평점 : {rating}
-            유저평가수 : {user_ratings_total}
-            ```'''
-            list.append(restraunt)
-        
-        return list 
+        #language: kor
+        #device_uuid: bcp9t15471855646162322dtfhz
+        #device_type: web
+        #start_index: 0
+        #request_count: 20
+        #keyword: 필동
+        #filter: {"subcuisine_codes":[],"metro_codes":[],"price_codes":["2","1"],"cuisine_codes":[2],"is_parking_available":0} 
+            
+        # 한식 1 일식 2 중식 3 양식  4
+        cuisine_arr = []
+        if msg == 'all':
+           cuisine_arr.append(1) 
+           cuisine_arr.append(2) 
+           cuisine_arr.append(3) 
+           cuisine_arr.append(4) 
+        if msg == '한식':
+            cuisine_arr.append(1)
+        if msg == '일식':
+            cuisine_arr.append(2)
+        if msg == '중식':
+            cuisine_arr.append(3)
+        if msg == '양식':
+            cuisine_arr.append(4)
+        # 가격 제한 코드 : 만원미만 1, 만원대 2
+        filter = {"subcuisine_codes":[],"metro_codes":[],"price_codes":["1"],"cuisine_codes":cuisine_arr,"is_parking_available":0} 
+        params = { 'language':'kor', 'device_uuid': 'bcp9t15471855646162322dtfhz', 'device_type':'web','start_index':0,'request_count':20,'keyword':'필동','filter':json.dumps(filter), 'order_by':2}
+        print(params)
+        url ='https://stage.mangoplate.com/api/v5/search/by_keyword.json'
+        headers = {'User-agent': 'your bot 0.1'}
+        get_data = requests.post(url,headers=headers, data= params )
+        json_list = json.loads(get_data.text)
+        print(json_list['result'][0]['restaurant']['name'])
+        tlist = []
+        for restaurant in json_list['result']:
+            rlist = []
+            name = '```\n식당이름 : ' + restaurant['restaurant']['name']
+            rlist.append(name)
+            address = '주소 : ' +  restaurant['restaurant']['address']
+            rlist.append(address)
+            rating = '점수 : ' +  str(restaurant['restaurant']['rating'])
+            rlist.append(rating)
+            picture = '```\n사진 : ' +  restaurant['restaurant']['picture_url']
+            rlist.append(picture)
+            string = '\n'.join(rlist)
+            tlist.append(string) 
+        print(tlist)
+        return tlist 
