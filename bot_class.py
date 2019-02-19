@@ -15,7 +15,9 @@ class Bot:
         #print(self.config)
 
     def loop(self):
+
         #print('start loop')
+
         count = 0
         list= []
         while True:
@@ -25,10 +27,12 @@ class Bot:
                 continue
             if count==0  :
                 list = self._crwaling(msg)
+
                 #print(list)
             count =randint(0,59)
             msg = '우리 이거먹어요!\n'+list[count]
             #print('befor send')
+
             self._send(channel,msg)
     
     def _read(self):
